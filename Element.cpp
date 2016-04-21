@@ -20,11 +20,11 @@ static const sf::Image choice_image(int choice) {
 	static sf::Image im4;
 	static sf::Image im5;
 	if (!t) {
-		im1.loadFromFile("images/1.png");
-		im2.loadFromFile("images/2.png");
-		im3.loadFromFile("images/3.png");
-		im4.loadFromFile("images/4.png");
-		im5.loadFromFile("images/5.png");
+		im1.loadFromFile("images/11.png");
+		im2.loadFromFile("images/22.png");
+		im3.loadFromFile("images/33.png");
+		im4.loadFromFile("images/44.png");
+		im5.loadFromFile("images/55.png");
 		t = true;
 	}
 	switch (choice)
