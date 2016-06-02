@@ -22,7 +22,7 @@ public:
 	void Create_element() { element.reset(new Element(coordinate)); }
 	void Del_element() { element.~shared_ptr(); }
 	sf::Sprite draww() { return element->sprite; }
-	friend class Player;
+	friend class Game_Algorithm;
 };
 
 #endif GREED_ELEMENT_H

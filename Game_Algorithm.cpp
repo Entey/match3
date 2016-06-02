@@ -1,12 +1,12 @@
-#include "Resources\Game_Algorithm.h"
+#include "Game_Algorithm.h"
 #include <memory>
-Player::Player() : isMove(false), isPosibleSwap(0), score(0), swap_count(1), frame(0) { // create coordinate for view
-	Generation_Greed();
+Game_Algorithm::Game_Algorithm() : isMove(false), isPosibleSwap(0), score(0), swap_count(1), frame(0) { // create coordinate for view
+	Generation_grid();
 	cursor_texture.loadFromFile("images/cursor.png");
 	cursor.setTexture(cursor_texture);
 }
 
-void Player::Generation_Greed() {
+void Game_Algorithm::Generation_grid() {
 	x = y = 50;
 	while (y <= 400) {
 	while (x <= 400) {
@@ -25,7 +25,7 @@ void Player::Generation_Greed() {
 		}
 }
 
-void Player::Swap(node& left, node &right){
+void Game_Algorithm::Swap(node& left, node &right){
 	node swa;
 	swa.element = left.element;
 	left.element = right.element;
@@ -33,7 +33,7 @@ void Player::Swap(node& left, node &right){
 }
 
 
-void Player::Check_Startline(){
+void Game_Algorithm::Check_Startline(){
 	for (int i = 0; i < n; i++)
 		if (grid[0][i].isEmpty == true) {
 			grid[0][i].Create_element();
@@ -41,7 +41,7 @@ void Player::Check_Startline(){
 		}
 }
 
-void Player::DropDown(const float &time) {
+void Game_Algorithm::DropDown(const float &time) {
 	for (int i = 0; i<n - 1; i++)
 	for (int j = 0; j<n; j++) {
 			if (grid[i][j].isEmpty == false && grid[i + 1][j].isEmpty == true) {
@@ -61,7 +61,7 @@ void Player::DropDown(const float &time) {
 		}
 }
 
-void Player::Swap_Elements(const float &time) {
+void Game_Algorithm::Swap_Elements(const float &time) {
 	for (int i = 0; i < n; i++)
 	for (int j = 0; j < n; j++) {	
 			if (grid[i][j].isSelected && grid[i][j + 1].isSelected  && j < 7 && isPosibleSwap == 2) { // перевірка на swap елементів по горизонталі
@@ -106,7 +106,7 @@ void Player::Swap_Elements(const float &time) {
 }
 
 
-void Player::Graphics_Blow(float time, sf::RenderWindow & window) {
+void Game_Algorithm::Graphics_Blow(float time, sf::RenderWindow & window) {
 	angle = 0.3*time;
 	for (int i = 0; i < n; i++)
 	for (int j = 0; j < n; j++) { 
@@ -126,7 +126,7 @@ void Player::Graphics_Blow(float time, sf::RenderWindow & window) {
 		}
 }
 
-void Player::ClicMouse(const sf::Event &ev, sf::RenderWindow &window) {
+void Game_Algorithm::ClicMouse(const sf::Event &ev, sf::RenderWindow &window) {
 	pixelPos = sf::Mouse::getPosition(window);
 	pos = window.mapPixelToCoords(pixelPos);
 
@@ -171,7 +171,7 @@ void Player::ClicMouse(const sf::Event &ev, sf::RenderWindow &window) {
 			}
 }
 
-void Player::Check_line() { // перевірка ліній на видалення 3 та більше елементів
+void Game_Algorithm::Check_line() { // перевірка ліній на видалення 3 та більше елементів
 	for (int i = 7; i >= 0; i--)
 	for (int j = 7; j > 1; j--) {
 		// по горизонталі
@@ -214,7 +214,7 @@ void Player::Check_line() { // перевірка ліній на видалення 3 та більше елементі
 			else continue;
 			}
 	if (vec_for_dell.size() >= 4) hum_bonus++;
-	if (vec_for_dell.size() >= 3) color_bonus++;
+	if (vec_for_dell.size() >= 5) color_bonus++;
 	for (auto i : vec_for_dell) {
 		i->DellAnimation = true;
 		i->element = nullptr;
@@ -226,7 +226,7 @@ void Player::Check_line() { // перевірка ліній на видалення 3 та більше елементі
 
 }
 
-void Player::Show(sf::RenderWindow &window) {
+void Game_Algorithm::Show(sf::RenderWindow &window) {
 	for (int i = 0; i < n; i++)
 		for (int j = 0; j < n; j++)
 			if (grid[i][j].isEmpty == false)
@@ -234,33 +234,123 @@ void Player::Show(sf::RenderWindow &window) {
 	if (isSelectedHum && hum_bonus) window.draw(cursor);
 }
 
-void Player::setColorBonus() {
-	if (!bWhitch_col && color_bonus >= 3) {
+void Game_Algorithm::update(float _time)
+{
+	DropDown(_time);
+	Swap_Elements(_time);
+	Check_line();
+	setColorBonus();
+	Check_Startline();
+	
+	if(lvl_time >= 0)
+	lvl_time -= _time*0.001;
+
+}
+
+void Game_Algorithm::set_lvl(int num)
+{
+	switch (num) {
+	case 1:
+		swap_count = 30;
+		break;
+	case 2:
+		swap_count = 200;
+		lvl_time = 300;
+		break;
+	case 3:
+		swap_count = 0;
+		hum_bonus = 50;
+		break;
+	case 4:
+		swap_count = 100;
+		break;
+	case 5:
+		swap_count = 1000;
+		lvl_time = 350;
+		hum_bonus = 10;
+		break;
+	
+	}
+}
+
+int Game_Algorithm::Successlvl(int i)
+{
+	switch (i) {
+	case 1:
+		if (swap_count == 0 && score >= 2000)
+			return 1;
+		else if(swap_count == 0)
+			return 2;
+		hum_bonus = 0;
+		color_bonus = 0;
+		break;
+	case 2:
+		if (lvl_time <= 0.1 && score >= 3000)
+			return 1;
+		else if (lvl_time <= 0.1)
+			return 2;
+		color_bonus = 0;
+		break;
+	case 3:
+		if(hum_bonus == 0 && score >= 2000)
+			return 1;
+		else if (hum_bonus == 0)
+			return 2;
+		color_bonus = 0;
+		break;
+	case 4:
+		if (swap_count == 0 && score >= 10000)
+			return 1;
+		else if (swap_count == 0)
+			return 2;
+		break;
+	case 5:
+		if (lvl_time <= 0.1 && score >= 5000)
+			return 1;
+		else if (lvl_time <= 0.1)
+			return 2;
+		swap_count = 100;
+		hum_bonus = 10;
+		break;
+	}
+	return 0;
+}
+
+
+void Game_Algorithm::setColorBonus() {
+	if (!bWhich_col && color_bonus >= 3) {
 		random_device rd;
 		mt19937 gen(rd());
 		uniform_int_distribution<int> one_to_five{ 1, 5 };
-		whitch_col = one_to_five(gen);
-		bWhitch_col = true;
+		which_col = one_to_five(gen);
+		bWhich_col = true;
 	}
 
 	if (isPushedColBon) { // видалення елементів з однаковим кольором
 		for (int i = 0; i < n; i++)
 			for (int j = 0; j < n; j++) {
-				if (!isMove && grid[i][j].element->choice == whitch_col) {
+				if (!isMove && grid[i][j].element->choice == which_col) {
 					grid[i][j].DellAnimation = true;
 					grid[i][j].isEmpty = true;
 					grid[i][j].element = nullptr;
 					color_bonus = 0;
+					score += 10;
 				}
 			}
-		bWhitch_col = false;
+		bWhich_col = false;
 		isPushedColBon = false;
 	}
 }
 
-int Player::getSwapCount() { return swap_count; }
-int Player::getScore() { return score; }
-int Player::getHumBunus() {	return hum_bonus; }
-int Player::getColBonus() {	return color_bonus; }
-int Player::get_Color() { return whitch_col; }
-bool Player::getIsMove() { return isMove; }
+float Game_Algorithm::getTimelvl()
+{
+	return lvl_time;
+}
+
+int Game_Algorithm::getSwapCount() { return swap_count; }
+int Game_Algorithm::getScore() { return score; }
+int Game_Algorithm::getHumBunus() {	return hum_bonus; }
+int Game_Algorithm::getColBonus() {	return color_bonus; }
+int Game_Algorithm::get_Color() { return which_col; }
+bool Game_Algorithm::getIsMove() { return isMove; }
+

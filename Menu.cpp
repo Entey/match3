@@ -1,7 +1,7 @@
-#include "Resources\Menu.h"
+#include "Menu.h"
 
 Mmenu::Mmenu(sf::RenderWindow &w) :window(w) {
-	menuTexture1.loadFromFile("images/111.png");
+	menuTexture1.loadFromFile("images/button_chose_level.png");
 	menuTexture2.loadFromFile("images/222.png");
 	menuTexture3.loadFromFile("images/333.png");
 	menu1.setTexture(menuTexture1); menu2.setTexture(menuTexture2); menu3.setTexture(menuTexture3);
@@ -21,7 +21,7 @@ Mmenu::Mmenu(sf::RenderWindow &w) :window(w) {
 	menu3.setPosition(100, 150);
 
 	view.reset(sf::FloatRect(0, 0, window.getSize().x, window.getSize().y));
-
+	inp = new Input_Line(25, 250, 300);
 
 }
 
@@ -45,18 +45,19 @@ float Mmenu::update(float time){
 			if (menuNum == 2) {}
 			if (menuNum == 3)  { window.close(); return ReturnTime; }
 		}
+		
 
-
-		while (window.pollEvent(event)){
-
-			if (event.type == sf::Event::Closed){
+		while (window.pollEvent(ev)){
+			
+			inp->exec(window, ev);
+			if (ev.type == sf::Event::Closed){
 				window.close();
 				return ReturnTime;
 			}
-			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Q){
+			if (ev.type == sf::Event::KeyPressed && ev.key.code == sf::Keyboard::Q){
 				return ReturnTime;
 			}
-
+			
 		}
 
 		window.clear();
@@ -65,6 +66,7 @@ float Mmenu::update(float time){
 		window.draw(menu1);
 		window.draw(menu2);
 		window.draw(menu3);
+		inp->show(window);
 		window.display();
 	}
 	if (menuNum == 1) return 0;

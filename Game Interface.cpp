@@ -115,19 +115,30 @@ void Game_Interface::Set_Buttons(int countHum, int countCol, int whitch_col){
 }
 
 
-void Game_Interface::TimeLine(float time, int swap_count, int choice){
+void Game_Interface::TimeLine(float lvl_time, int swap_count){
 	LineTime->setPosition(sf::Vector2f(420, 485));
-	switch (choice){
-	case 1:
-		level_time = level_time - time*0.001;
+	level_time = lvl_time;
+	if (level_time > 0.0) {
 		LineTime->setOrigin(level_time, 40);
 		LineTime->setSize(sf::Vector2f(level_time, 40));
-		break;
-	case 2:
+	}
+	else{
 		LineTime->setOrigin(swap_count, 40);
 		LineTime->setSize(sf::Vector2f(swap_count, 40));
-		break;
 	}
+
+	
+}
+
+void Game_Interface::Set_Text(int SwapCount,int Score, int Hum, int Col){
+	std::ostringstream str1, str2, str3;
+	str1 << SwapCount; str2 << Score; str3 << Hum;
+	text1.setString("  Moves: " + str1.str() + "\n\nScores: " + str2.str());
+	text2.setString(str3.str());
+}
+
+void Game_Interface::Set_Button(float time)
+{
 	if (isColor) {
 		Color1.rotate(0.1*time);
 		Color2.rotate(-0.1*time);
@@ -136,12 +147,5 @@ void Game_Interface::TimeLine(float time, int swap_count, int choice){
 		Color1.setRotation(0);
 		Color2.setRotation(90);
 	}
-}
-
-void Game_Interface::Set_Text(int SwapCount,int Score, int Hum, int Col){
-	std::ostringstream str1, str2, str3;
-	str1 << SwapCount; str2 << Score; str3 << Hum;
-	text1.setString("  Moves: " + str1.str() + "\n\nScores: " + str2.str());
-	text2.setString(str3.str());
 }
 
